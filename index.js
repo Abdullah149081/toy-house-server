@@ -40,7 +40,15 @@ async function run() {
     await toyCollection.createIndex(indexKeys, indexOptions);
 
     app.get("/toyProducts", async (req, res) => {
-      const result = await toyCollection.find().toArray();
+      const sort = req.query.sort;
+
+      const query = {};
+
+      const options = {
+        sort: { price: sort === "asc" ? 1 : -1 },
+      };
+
+      const result = await toyCollection.find(query, options).limit(20).toArray();
       res.send(result);
     });
 
