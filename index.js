@@ -35,6 +35,10 @@ async function run() {
 
     const toyCollection = client.db("toyHouseDB").collection("products");
 
+    const indexKeys = { toyName: 1 };
+    const indexOptions = { name: "toyName" };
+    await toyCollection.createIndex(indexKeys, indexOptions);
+
     app.get("/toyProducts", async (req, res) => {
       const result = await toyCollection.find().toArray();
       res.send(result);
@@ -44,6 +48,17 @@ async function run() {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await toyCollection.findOne(query);
+      res.send(result);
+    });
+
+    app.get("/toyNameBySearch/:search", async (req, res) => {
+      const search = req.params.search;
+      const result = await toyCollection
+        .find({
+          toyName: { $regex: search, $options: "i" },
+        })
+        .toArray();
+
       res.send(result);
     });
 
@@ -86,7 +101,7 @@ async function run() {
       };
 
       const result = await toyCollection.updateOne(filter, updateProduct, options);
-      res.send(result)
+      res.send(result);
     });
 
     app.delete("/toyProducts/:id", async (req, res) => {
