@@ -86,8 +86,12 @@ async function run() {
           email: req.query.email,
         };
       }
+      const sort = req.query.sort;
+      const options = {
+        sort: { price: sort === "asc" ? 1 : -1 },
+      };
 
-      const result = await toyCollection.find(query).toArray();
+      const result = await toyCollection.find(query, options).toArray();
       res.send(result);
     });
 
